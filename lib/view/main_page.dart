@@ -57,7 +57,7 @@ class _MainPageState extends State<MainPage> {
 
     /// Initialize timer for 3 seconds, it will be active as soon as intialized
     timer = Timer(
-      const Duration(seconds: 3),
+      const Duration(seconds: 2),
       () {
         /// Navigate to seconds screen when timer callback in executed
         _pc.jumpToPage(1);
