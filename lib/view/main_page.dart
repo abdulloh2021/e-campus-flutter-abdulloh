@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_ecampus/constants/r.dart';
 import 'package:flutter_ecampus/models/users.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_ecampus/view/main/dosen/dosen_page.dart';
 import 'package:flutter_ecampus/view/main/jadwal/jadwal_page.dart';
 // import 'package:flutter_ecampus/view/main/dashboard/home_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/home_page.dart';
+import 'package:flutter_ecampus/view/main/latihan_soal/loading_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/mapel_page.dart';
 import 'package:flutter_ecampus/view/main/nilai/nilai_page.dart';
 // import 'package:flutter_ecampus/view/main/payment/payment_page.dart';
@@ -41,17 +44,27 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  Timer? timer;
   final _pc = PageController();
   int index = 0;
-  static final DateTime now = DateTime.now();
-  static final DateFormat formatter = DateFormat('EEEE');
-  final String Hari = formatter.format(now);
+  // static final DateTime now = DateTime.now();
+  // static final DateFormat formatter = DateFormat('EEEE');
+  // final String Hari = formatter.format(now);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
+    /// Initialize timer for 3 seconds, it will be active as soon as intialized
+    timer = Timer(
+      const Duration(seconds: 3),
+      () {
+        /// Navigate to seconds screen when timer callback in executed
+        _pc.jumpToPage(1);
+      },
+    );
     getDataUser();
+    // _pc.jumpToPage(index);
   }
 
   @override
@@ -75,11 +88,13 @@ class _MainPageState extends State<MainPage> {
         controller: _pc,
         physics: NeverScrollableScrollPhysics(),
         children: [
+          LoadingPage(),
           HomePage(
             dataKeyNim: widget.dataKeyNim,
             dataKeySemester: "${userProfile?.data?[0].semester}",
-            dataKeyHari: Hari,
-          ), //0
+            // dataKeyHari: Hari,
+          ),
+          //0
           DosenPage(), //1
           // ChatPage(),
 
@@ -114,7 +129,7 @@ class _MainPageState extends State<MainPage> {
                   child: Material(
                     child: InkWell(
                       onTap: () {
-                        index = 0;
+                        index = 1;
                         _pc.jumpToPage(index);
                         // _pc.animateToPage(index,
                         //     duration: Duration(milliseconds: 500),
@@ -137,7 +152,7 @@ class _MainPageState extends State<MainPage> {
                     child: InkWell(
                       onTap: () {
                         print("dosen");
-                        index = 1;
+                        index = 2;
                         _pc.jumpToPage(index);
                         // _pc.animateToPage(
                         //   index,
@@ -181,7 +196,7 @@ class _MainPageState extends State<MainPage> {
                     child: InkWell(
                       onTap: () {
                         print("nilai");
-                        index = 2;
+                        index = 3;
                         _pc.jumpToPage(index);
                         // _pc.animateToPage(
                         //   index,
@@ -207,7 +222,7 @@ class _MainPageState extends State<MainPage> {
                     child: InkWell(
                       onTap: () {
                         print("profile");
-                        index = 3;
+                        index = 4;
                         _pc.jumpToPage(index);
                         // _pc.animateToPage(
                         //   index,

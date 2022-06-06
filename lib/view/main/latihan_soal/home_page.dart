@@ -8,24 +8,28 @@ import 'package:flutter_ecampus/view/main/jadwal/jadwal_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/mapel_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   final String dataKeyNim;
   final String dataKeySemester;
-  final String dataKeyHari;
-  const HomePage(
-      {Key? key,
-      required this.dataKeyNim,
-      required this.dataKeySemester,
-      required this.dataKeyHari})
-      : super(key: key);
+  // final String dataKeyHari;
+  const HomePage({
+    Key? key,
+    required this.dataKeyNim,
+    required this.dataKeySemester,
+    // required this.dataKeyHari
+  }) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  static final DateTime now = DateTime.now();
+  static final DateFormat formatter = DateFormat('EEEE');
+  final String Hari = formatter.format(now);
   //_get berfungsi untuk menampung data dari internet nanti
   List getJadwals = [];
 
@@ -44,17 +48,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Jadwals? userJadwal;
-  // void getDataJadwal() async {
-  //   Jadwals? hasilJadwals = await Services.getJadwalsById(
-  //       "e94d476f-49ff-4d6c-abec-c8c30c242725"); //get data user
-  //   if (hasilJadwals != null) {
-  //     setState(() {
-  //       userJadwal = hasilJadwals;
-  //     });
-  //   }
-  // }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -69,7 +62,9 @@ class _HomePageState extends State<HomePage> {
     try {
       final response = await http.get(Uri.parse(
           // "https://newsapi.org/v2/top-headlines?country=id&category=business&apiKey=${apikey}"
-          "https://ecampus-flutter.000webhostapp.com/jadwalweek/${widget.dataKeyNim}/${widget.dataKeySemester}/${widget.dataKeyHari}"));
+          "https://ecampus-flutter.000webhostapp.com/jadwalweek/${widget.dataKeyNim}/${widget.dataKeySemester}/" +
+              Hari +
+              ""));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
