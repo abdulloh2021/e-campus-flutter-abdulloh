@@ -21,10 +21,6 @@ class _NilaiPageState extends State<NilaiPage> {
   //_get berfungsi untuk menampung data dari internet nanti
   List getNilai = [];
 
-  //paste apikey yang didapatkan dari newsapi.org
-  // var apikey = '69d4783612054e4585f2d5a5883fc3a8';
-  // var apikey = '2b51d2c0-eeb3-45e6-892f-dae700d5fe11';
-
   Users? userProfile;
   // Users? lokalProfile;
   void getDataUser() async {
@@ -39,7 +35,6 @@ class _NilaiPageState extends State<NilaiPage> {
 
   @override
   void initState() {
-    // ignore: todo
     // TODO: implement initState
     super.initState();
 
@@ -161,16 +156,7 @@ class _NilaiPageState extends State<NilaiPage> {
                 //padding digunakan untuk memberikan jarak bagian atas listtile agar tidak terlalu mepet
                 //menggunakan edgeInsets.only untuk membuat jarak hanya pada bagian atas saja
                 return GestureDetector(
-                    onTap: () {
-                      // Navigator.of(context).pushNamed(JadwalDetailPage.route);
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => JadwalDetailPage(
-                      //               dataKeyKodeMatkul:
-                      //                   "c4a77af8-3555-4abb-8358-72d40721ecdc",
-                      //             )));
-                    },
+                    onTap: () {},
                     child: Container(
                       decoration: BoxDecoration(
                           color: Colors.white,

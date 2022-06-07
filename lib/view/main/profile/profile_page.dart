@@ -43,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Akun Saya"),
+        title: Text("Profile"),
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
@@ -145,19 +145,17 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Identitas Diri"),
-                SizedBox(height: 10),
+                // Text("Identitas Diri"),
+                // SizedBox(height: 10),
                 Text(
-                  "Name Lengkap",
+                  "Nama Lengkap",
                   style: TextStyle(
                     color: R.colors.greySubtitleHome,
                     fontSize: 12,
                   ),
                 ),
                 Text(
-                  "${userProfile?.data?[0].nama}" +
-                      " " +
-                      "${userProfile?.data?[0].nama}",
+                  "${userProfile?.data?[0].nama}",
                   style: TextStyle(
                     // color: R.colors.greySubtitleHome,
                     fontSize: 13,

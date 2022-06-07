@@ -7,10 +7,8 @@ import 'package:flutter_ecampus/view/main/jadwal/jadwal_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/mapel_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/paket_soal_page.dart';
 import 'package:flutter_ecampus/view/main_page.dart';
-import 'package:flutter_ecampus/view/register_page.dart';
 import 'package:flutter_ecampus/view/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'constants/r.dart';
 
 void main() async {
@@ -50,7 +48,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "/": (context) => const SplashScreen(),
         LoginPage.route: (context) => LoginPage(),
-        RegisterPage.route: (context) => const RegisterPage(),
+        // RegisterPage.route: (context) => const RegisterPage(),
         // MainPage.route: (context) => const MainPage(),
         // JadwalPage.route: (context) => JadwalPage(),
         // JadwalDetailPage.route: (context) => const JadwalDetailPage(),

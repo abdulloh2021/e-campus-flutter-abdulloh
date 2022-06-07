@@ -25,20 +25,13 @@ class SplashScreen extends StatelessWidget {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         var emailgoogle = user.email.toString();
-        var result = emailgoogle.substring(0, 8); // 'artlang'
-        // result = string.substring(1, 4); // 'art
-        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //   content: Text("Email " + result),
-        //   duration: Duration(seconds: 5),
-        // ));
+        var result = emailgoogle.substring(0, 8);
+
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => MainPage(
-                      dataKeyNim:
-                          // "${userProfile?.data?[0].nim.toString()}",
-                          result,
-                      // user.email.toString().substring(0, 7),
+                      dataKeyNim: result,
                     )));
       } else {
         GoogleSignIn().signOut();
@@ -58,11 +51,6 @@ class SplashScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-
-        // Image.asset(
-        //   R.assets.icSplash,
-        //   width: MediaQuery.of(context).size.width * 0.5,
-        // ),
       ),
     );
   }

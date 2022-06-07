@@ -33,10 +33,6 @@ class _HomePageState extends State<HomePage> {
   //_get berfungsi untuk menampung data dari internet nanti
   List getJadwals = [];
 
-  //paste apikey yang didapatkan dari newsapi.org
-  // var apikey = '69d4783612054e4585f2d5a5883fc3a8';
-  var apikey = '560c0eca-da28-4a92-9057-2aef5828754a';
-
   Users? userProfile;
   void getDataUser() async {
     Users? hasilUsers =
@@ -114,11 +110,60 @@ class _HomePageState extends State<HomePage> {
                       itemCount: 5,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: ((context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: Image.asset(
-                            R.assets.banneHome,
+                        return Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 20.0,
+                            // vertical: 15,
                           ),
+                          decoration: BoxDecoration(
+                              color: R.colors.primary,
+                              image: DecorationImage(
+                                colorFilter: new ColorFilter.mode(
+                                    Colors.black.withOpacity(0.5),
+                                    BlendMode.dstATop),
+                                image: NetworkImage(
+                                    "https://fashionsista.co/wallpaper/wallpaper/20210202/background-keren-biru-muda-preview.jpg"),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(20)),
+                          height: 147,
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: Container(
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0,
+                                vertical: 15,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Berita " + index.toString(),
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Kegiatan Bakti Sosial Pembagian Sembako",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Kampus B STIE & STMIK JAYAKARTA",
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              )),
                         );
                       }),
                     ),
@@ -141,7 +186,7 @@ class _HomePageState extends State<HomePage> {
           Row(
             children: [
               Text(
-                "Pilih Pelajaran",
+                "Matkul, Hari ini",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -285,20 +330,40 @@ class _HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           Container(
-            width: MediaQuery.of(context).size.width * 0.7,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 15,
-            ),
-            child: Text(
-              "Bingung Cari Kampus? Yuk Join! di                     STMIK JAYAKARTA",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+              width: MediaQuery.of(context).size.width * 0.7,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 15,
               ),
-            ),
-          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Bingung Cari Kampus?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Yuk Join! di",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "STMIK JAYAKARTA",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )),
           Positioned(
             right: 0,
             bottom: 0,
@@ -347,90 +412,14 @@ class _HomePageState extends State<HomePage> {
               shape: BoxShape.circle,
               image: DecorationImage(
                   image: NetworkImage('${userProfile?.data?[0].foto}'),
-                  // image: AssetImage(R.assets.imgUser),
                   fit: BoxFit.cover),
             ),
           ),
-
-          // Image.asset(
-          //   R.assets.imgUser,
-          //   width: 35,
-          //   height: 35,
-          // ),
         ],
       ),
     );
   }
 }
-
-// class MapelWidget extends StatelessWidget {
-//   const MapelWidget({
-//     Key? key,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//           color: Colors.white, borderRadius: BorderRadius.circular(10)),
-//       margin: EdgeInsets.only(bottom: 10),
-//       padding: EdgeInsets.symmetric(horizontal: 18, vertical: 21),
-//       child: Row(children: [
-//         Container(
-//           height: 53,
-//           width: 53,
-//           padding: EdgeInsets.all(13),
-//           decoration: BoxDecoration(
-//               color: R.colors.grey, borderRadius: BorderRadius.circular(10)),
-//           child: Image.asset(R.assets.icAtom),
-//         ),
-//         SizedBox(
-//           width: 6,
-//         ),
-//         Expanded(
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Text(
-//                 "Matematika",
-//                 style: TextStyle(
-//                   fontWeight: FontWeight.bold,
-//                   fontSize: 12,
-//                 ),
-//               ),
-//               Text(
-//                 "0/50 Paket latihan soal",
-//                 style: TextStyle(
-//                     fontWeight: FontWeight.w500,
-//                     fontSize: 12,
-//                     color: R.colors.greySubtitleHome),
-//               ),
-//               SizedBox(height: 5),
-//               Stack(
-//                 children: [
-//                   Container(
-//                     height: 5,
-//                     width: double.infinity,
-//                     decoration: BoxDecoration(
-//                         color: R.colors.grey,
-//                         borderRadius: BorderRadius.circular(10)),
-//                   ),
-//                   Container(
-//                     height: 5,
-//                     width: MediaQuery.of(context).size.width * 0.4,
-//                     decoration: BoxDecoration(
-//                         color: R.colors.primary,
-//                         borderRadius: BorderRadius.circular(10)),
-//                   ),
-//                 ],
-//               )
-//             ],
-//           ),
-//         )
-//       ]),
-//     );
-//   }
-// }
 
 class JadwalWidget extends StatelessWidget {
   const JadwalWidget({
@@ -489,24 +478,6 @@ class JadwalWidget extends StatelessWidget {
                     fontSize: 12,
                     color: R.colors.greySubtitleHome),
               ),
-              // Stack(
-              //   children: [
-              //     Container(
-              //       height: 5,
-              //       width: double.infinity,
-              //       decoration: BoxDecoration(
-              //           color: R.colors.grey,
-              //           borderRadius: BorderRadius.circular(10)),
-              //     ),
-              //     Container(
-              //       height: 5,
-              //       width: MediaQuery.of(context).size.width * 0.4,
-              //       decoration: BoxDecoration(
-              //           color: R.colors.primary,
-              //           borderRadius: BorderRadius.circular(10)),
-              //     ),
-              //   ],
-              // )
             ],
           ),
         )

@@ -51,7 +51,7 @@ class _DosenPageState extends State<DosenPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Akun Dosen"),
+          title: Text("Dosen"),
           centerTitle: true,
           automaticallyImplyLeading: false,
         ),

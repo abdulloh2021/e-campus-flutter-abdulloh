@@ -21,19 +21,6 @@ class PembayaranPage extends StatefulWidget {
 }
 
 class _PembayaranPageState extends State<PembayaranPage> {
-  // JadwalDetail? jadwalDetail;
-  // // Users? lokalProfile;
-  // void getDataJadwalDetail() async {
-  //   JadwalDetail? hasilJadwalDetail =
-  //       await Services.getJadwalDetailByKodeMatkul(
-  //           widget.dataKeyNim); //get data user
-  //   if (hasilJadwalDetail != null) {
-  //     setState(() {
-  //       jadwalDetail = hasilJadwalDetail;
-  //     });
-  //   }
-  // }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -87,15 +74,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
                       width: 200,
                       height: 100,
                       child: Image.asset(R.assets.imgBca),
-                      decoration: BoxDecoration(
-
-                          // shape: BoxShape.circle,
-                          // image: DecorationImage(
-                          //     // image: NetworkImage(
-                          //     //     '${jadwalDetail?.data?.avatarDosen}'),
-                          //     image: AssetImage(R.assets.imgBca),
-                          //     fit: BoxFit.cover),
-                          ),
+                      decoration: BoxDecoration(),
                     ),
                   ),
                   SizedBox(height: 10),

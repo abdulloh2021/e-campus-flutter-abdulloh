@@ -4,7 +4,7 @@ import 'package:flutter_ecampus/constants/r.dart';
 import 'package:flutter_ecampus/models/users.dart';
 import 'package:flutter_ecampus/services/services.dart';
 import 'package:flutter_ecampus/view/main_page.dart';
-import 'package:flutter_ecampus/view/register_page.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:url_encoder/url_encoder.dart';
