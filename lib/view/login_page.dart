@@ -20,23 +20,27 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   Users? userProfile;
 
+  // ============== Memanggil data user dari Firebase =================
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount? googleUser =
+        await GoogleSignIn().signIn(); //sign in with google
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
+        await googleUser?.authentication; //get auth details
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
-    );
+    ); //create credential
 
     // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+    return await FirebaseAuth.instance
+        .signInWithCredential(credential); //sign in with credential
   }
+  // ===================================================================
 
   GoogleSignIn _googleSignIn = GoogleSignIn();
 
@@ -82,12 +86,13 @@ class _LoginPageState extends State<LoginPage> {
             ButtonLogin(
               onTap: () async {
                 await signInWithGoogle();
-                final user = FirebaseAuth.instance.currentUser;
+                final user =
+                    FirebaseAuth.instance.currentUser; // user yang login
                 if (user != null) {
                   var uri = user.email.toString();
                   var encoded = Uri.encodeComponent(uri);
                   Users? hasilUsers = await Services.getUsersByEmail(
-                      encoded.toString()); //get data user
+                      encoded.toString()); // mengambil data user dari API
                   if (hasilUsers != null) {
                     setState(() {
                       userProfile = hasilUsers;
@@ -105,23 +110,23 @@ class _LoginPageState extends State<LoginPage> {
                                 builder: (context) => MainPage(
                                       dataKeyNim:
                                           "${userProfile?.data?[0].nim.toString()}",
-                                    )));
+                                    ))); // jika email sama maka masuk ke main page
                       } else {
-                        GoogleSignIn().signOut();
-                        FirebaseAuth.instance.signOut();
+                        GoogleSignIn().signOut(); //sign out google
+                        FirebaseAuth.instance.signOut(); //sign out firebase
                       }
                     });
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(user.email.toString() + " Tidak Terdaftar"),
                       duration: Duration(seconds: 4),
-                    ));
+                    )); // jika email tidak terdaftar maka akan muncul snackbar
                   }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("gagal Masuk"),
                     duration: Duration(seconds: 2),
-                  ));
+                  )); // jika gagal masuk maka akan muncul snackbar
                 }
               },
               backgroundColor: R.colors.primary,
@@ -158,6 +163,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+// ========== Class Button Login ======================
 class ButtonLogin extends StatelessWidget {
   const ButtonLogin({
     Key? key,
@@ -194,3 +200,4 @@ class ButtonLogin extends StatelessWidget {
     );
   }
 }
+// ===================================================

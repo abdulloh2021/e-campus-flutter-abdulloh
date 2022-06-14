@@ -4,15 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ecampus/constants/r.dart';
 import 'package:flutter_ecampus/models/users.dart';
 import 'package:flutter_ecampus/services/services.dart';
-// import 'package:flutter_ecampus/view/main/discussion/chat_page.dart';
 import 'package:flutter_ecampus/view/main/dosen/dosen_page.dart';
 import 'package:flutter_ecampus/view/main/jadwal/jadwal_page.dart';
-// import 'package:flutter_ecampus/view/main/dashboard/home_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/home_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/loading_page.dart';
 import 'package:flutter_ecampus/view/main/latihan_soal/mapel_page.dart';
 import 'package:flutter_ecampus/view/main/nilai/nilai_page.dart';
-// import 'package:flutter_ecampus/view/main/payment/payment_page.dart';
 import 'package:flutter_ecampus/view/main/profile/profile_page.dart';
 import 'package:intl/intl.dart';
 
@@ -64,7 +61,6 @@ class _MainPageState extends State<MainPage> {
       },
     );
     getDataUser();
-    // _pc.jumpToPage(index);
   }
 
   @override
@@ -88,22 +84,18 @@ class _MainPageState extends State<MainPage> {
         controller: _pc,
         physics: NeverScrollableScrollPhysics(),
         children: [
-          LoadingPage(),
+          LoadingPage(), //0
           HomePage(
             dataKeyNim: widget.dataKeyNim,
             dataKeySemester: "${userProfile?.data?[0].semester}",
-            // dataKeyHari: Hari,
-          ),
-          //0
-          DosenPage(), //1
-          // ChatPage(),
-
+          ), //1
+          DosenPage(), //2
           NilaiPage(
             dataKeyNim: widget.dataKeyNim,
-          ), //2
+          ), //3
           ProfilePage(
             dataKey: widget.dataKeyNim,
-          ), //3
+          ), //4
         ],
       ),
     );
@@ -124,16 +116,12 @@ class _MainPageState extends State<MainPage> {
             child: Row(children: [
               Expanded(
                 child: Padding(
-                  // padding: const EdgeInsets.symmetric(horizontal: 20),
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Material(
                     child: InkWell(
                       onTap: () {
                         index = 1;
                         _pc.jumpToPage(index);
-                        // _pc.animateToPage(index,
-                        //     duration: Duration(milliseconds: 500),
-                        //     curve: Curves.bounceInOut);
                       },
                       child: Column(
                         children: [
@@ -154,11 +142,7 @@ class _MainPageState extends State<MainPage> {
                         print("dosen");
                         index = 2;
                         _pc.jumpToPage(index);
-                        // _pc.animateToPage(
-                        //   index,
-                        //   duration: Duration(milliseconds: 500),
-                        //   curve: Curves.easeInOut,
-                        // );
+
                         setState(() {});
                       },
                       child: Column(
@@ -198,11 +182,7 @@ class _MainPageState extends State<MainPage> {
                         print("nilai");
                         index = 3;
                         _pc.jumpToPage(index);
-                        // _pc.animateToPage(
-                        //   index,
-                        //   duration: Duration(milliseconds: 500),
-                        //   curve: Curves.easeInOut,
-                        // );
+
                         setState(() {});
                       },
                       child: Column(
@@ -224,11 +204,7 @@ class _MainPageState extends State<MainPage> {
                         print("profile");
                         index = 4;
                         _pc.jumpToPage(index);
-                        // _pc.animateToPage(
-                        //   index,
-                        //   duration: Duration(milliseconds: 500),
-                        //   curve: Curves.easeInOut,
-                        // );
+
                         setState(() {});
                       },
                       child: Column(

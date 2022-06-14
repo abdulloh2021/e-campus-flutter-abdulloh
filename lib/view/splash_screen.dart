@@ -19,9 +19,8 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Users? userProfile;
+
     Timer(const Duration(seconds: 5), () {
-      // Navigator.of(context)
-      //     .push(MaterialPageRoute(builder: (context) => LoginPage()));
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         var emailgoogle = user.email.toString();
@@ -38,7 +37,7 @@ class SplashScreen extends StatelessWidget {
         FirebaseAuth.instance.signOut();
         Navigator.of(context).pushNamed(LoginPage.route);
       }
-    });
+    }); //delay 5 detik
 
     return Scaffold(
       backgroundColor: R.colors.primary,

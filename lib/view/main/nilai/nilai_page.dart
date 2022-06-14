@@ -22,7 +22,7 @@ class _NilaiPageState extends State<NilaiPage> {
   List getNilai = [];
 
   Users? userProfile;
-  // Users? lokalProfile;
+
   void getDataUser() async {
     Users? hasilUsers =
         await Services.getUsersById(widget.dataKeyNim); //get data user
@@ -46,7 +46,6 @@ class _NilaiPageState extends State<NilaiPage> {
   Future getDataNilaiByNim() async {
     try {
       final response = await http.get(Uri.parse(
-          // "https://newsapi.org/v2/top-headlines?country=id&category=business&apiKey=${apikey}"
           "https://ecampus-flutter.000webhostapp.com/krs/${widget.dataKeyNim}"));
 
       // cek apakah respon berhasil

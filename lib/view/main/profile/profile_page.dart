@@ -49,10 +49,6 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           TextButton(
             onPressed: () {
-              // builder:
-              // (context) => PembayaranPage(
-              //       dataKeyNim: "c4a77af8-3555-4abb-8358-72d40721ecdc",
-              //     );
               Navigator.push(
                   context,
                   MaterialPageRoute(

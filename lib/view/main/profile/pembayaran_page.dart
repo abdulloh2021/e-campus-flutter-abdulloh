@@ -15,7 +15,7 @@ class PembayaranPage extends StatefulWidget {
   PembayaranPage(
       {Key? key, required this.dataKeyNim, required this.dataKeyNama})
       : super(key: key);
-  // static String route = "jadwal_detail_page";
+
   @override
   State<PembayaranPage> createState() => _PembayaranPageState();
 }
@@ -25,7 +25,6 @@ class _PembayaranPageState extends State<PembayaranPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // getDataJadwalDetail();
   }
 
   @override
@@ -174,16 +173,12 @@ class _PembayaranPageState extends State<PembayaranPage> {
                   ),
                   SizedBox(height: 30),
                   ButtonPembayaranNama(
-                    onTap: () {
-                      // Navigator.of(context).pushNamed(RegisterPage.route);
-                    },
+                    onTap: () {},
                     backgroundColor: R.colors.primary,
                     borderColor: R.colors.primary,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Image.asset(R.assets.icGoogle),
-                        // SizedBox(width: 15),
                         Text(
                           widget.dataKeyNama,
                           style: TextStyle(

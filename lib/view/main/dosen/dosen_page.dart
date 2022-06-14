@@ -14,30 +14,32 @@ class DosenPage extends StatefulWidget {
 }
 
 class _DosenPageState extends State<DosenPage> {
-  List getDosens = [];
+  List getDosens = []; // list data dosen
 
-  var apikey = '936f480d-0e26-4f44-8698-0f1c2ada07c1';
+  // var apikey = '936f480d-0e26-4f44-8698-0f1c2ada07c1'; // api key
 
   @override
   void initState() {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    getDataDosens();
+    getDataDosens(); // get data dosen
   }
 
   //method untuk merequest/mengambil data dari internet
   Future getDataDosens() async {
+    // method untuk mengambil data dari internet
     try {
-      final response = await http
-          .get(Uri.parse("https://ecampus-flutter.000webhostapp.com/dosen"));
+      final response = await http.get(Uri.parse(
+          "https://ecampus-flutter.000webhostapp.com/dosen")); // url dari api
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        // jika berhasil
+        final data = jsonDecode(response.body); // data dari api
 
         setState(() {
-          //memasukan data yang di dapat dari internet ke variabel _get
+          //memasukan data yang di dapat dari internet ke variabel getDosens
           getDosens = data['data'];
         });
       }
@@ -68,6 +70,7 @@ class _DosenPageState extends State<DosenPage> {
                 onTap: () {
                   // Navigator.of(context).pushNamed(JadwalDetailPage.route);
                   Navigator.push(
+                      // Navigator.push adalah method untuk menggunakan routing
                       context,
                       // JadwalDetailPage(
                       //           dataKeyKodeMatkul:
@@ -75,7 +78,8 @@ class _DosenPageState extends State<DosenPage> {
                       //         )
                       MaterialPageRoute(
                           builder: (context) => DosenDetailPage(
-                              dataKeyKodeDosen: getDosens[index]['id_dosen'])));
+                              dataKeyKodeDosen: getDosens[index][
+                                  'id_dosen']))); // route untuk menampilkan halaman detail dosen
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -92,7 +96,7 @@ class _DosenPageState extends State<DosenPage> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             image: NetworkImage(getDosens[index]['foto'] ??
-                                "https://cdn.pixabay.com/photo/2018/03/17/20/51/white-buildings-3235135__340.jpg"),
+                                "https://cdn.pixabay.com/photo/2018/03/17/20/51/white-buildings-3235135__340.jpg"), // url gambar
                             // image: AssetImage(R.assets.imgUser),
                             fit: BoxFit.cover),
                       ),
@@ -110,14 +114,14 @@ class _DosenPageState extends State<DosenPage> {
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
-                          ),
+                          ), // nama dosen
                           Text(
-                            getDosens[index]['nidn'] ?? "NIDN",
+                            getDosens[index]['nidn'] ?? "NIDN", //
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
                                 color: R.colors.greySubtitleHome),
-                          ),
+                          ), // nidn
                           SizedBox(height: 5),
                           Text(
                             getDosens[index]['email'] ?? "Email Dosen",
@@ -125,7 +129,7 @@ class _DosenPageState extends State<DosenPage> {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
                                 color: R.colors.greySubtitleHome),
-                          ),
+                          ), // email dosen
                           Text(
                             getDosens[index]['nomorwhatsapp'] ??
                                 "Nomor Whatsapp",
@@ -133,7 +137,7 @@ class _DosenPageState extends State<DosenPage> {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
                                 color: R.colors.greySubtitleHome),
-                          ),
+                          ), // nomor whatsapp
                         ],
                       ),
                     )

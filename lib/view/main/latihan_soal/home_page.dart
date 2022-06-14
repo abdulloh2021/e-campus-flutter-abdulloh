@@ -27,9 +27,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static final DateTime now = DateTime.now();
-  static final DateFormat formatter = DateFormat('EEEE');
-  final String Hari = formatter.format(now);
+  static final DateTime now = DateTime.now(); //get current date
+  static final DateFormat formatter =
+      DateFormat('EEEE'); //data format for day (Monday, Tuesday, etc)
+  final String Hari = formatter.format(now); //get day dari hasil format Hari
   //_get berfungsi untuk menampung data dari internet nanti
   List getJadwals = [];
 
@@ -38,42 +39,42 @@ class _HomePageState extends State<HomePage> {
     Users? hasilUsers =
         await Services.getUsersById(widget.dataKeyNim); //get data user
     if (hasilUsers != null) {
+      //jika hasilUsers tidak kosong
       setState(() {
-        userProfile = hasilUsers;
+        //set state untuk menampilkan data user
+        userProfile = hasilUsers; //set userProfile dengan hasilUsers
       });
     }
-  }
+  } //end getDataUser
 
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
-    getDataUser();
-    getDataJadwalsByEmail();
-    // getDataJadwal();
+    super.initState(); //super initState
+    getDataUser(); //get data user
+    getDataJadwalsByEmail(); //get data jadwal
   }
 
   //method untuk merequest/mengambil data dari internet
   Future getDataJadwalsByEmail() async {
     try {
       final response = await http.get(Uri.parse(
-          // "https://newsapi.org/v2/top-headlines?country=id&category=business&apiKey=${apikey}"
           "https://ecampus-flutter.000webhostapp.com/jadwalweek/${widget.dataKeyNim}/${widget.dataKeySemester}/" +
               Hari +
-              ""));
+              "")); //get data jadwal by email, semester dan hari
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
+        //jika berhasil
+        final data = jsonDecode(response.body); //get data dari response
         setState(() {
           //memasukan data yang di dapat dari internet ke variabel _get
-          getJadwals = data['data'];
+          getJadwals = data['data']; //set getJadwals dengan data dari response
         });
       }
     } catch (e) {
       //tampilkan error di terminal
-      print(e);
+      print(e); //end print
     }
   }
 
@@ -84,9 +85,9 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: ListView(
           children: [
-            _buildUserHomeProfile(),
-            _buildTopBanner(context),
-            _buildHomeListMapel(),
+            _buildUserHomeProfile(), //memanggil method _buildUserHomeProfile
+            _buildTopBanner(context), //memanggil method _buildTopBanner
+            _buildHomeListMapel(), //memanggil method _buildHomeListMapel
             Container(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,6 +180,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Container _buildHomeListMapel() {
+    //method untuk menampilkan list mapel
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 21),
       child: Column(
@@ -318,6 +320,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Container _buildTopBanner(BuildContext context) {
+    //method untuk menampilkan banner atas
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 20.0,
@@ -378,6 +381,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Padding _buildUserHomeProfile() {
+    //method untuk menampilkan profile user
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 20.0,
@@ -421,67 +425,67 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class JadwalWidget extends StatelessWidget {
-  const JadwalWidget({
-    Key? key,
-  }) : super(key: key);
+// class JadwalWidget extends StatelessWidget { //widget untuk menampilkan jadwal
+//   const JadwalWidget({
+//     Key? key,
+//   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.only(bottom: 10),
-      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 21),
-      child: Row(children: [
-        Container(
-          height: 53,
-          width: 53,
-          padding: EdgeInsets.all(13),
-          decoration: BoxDecoration(
-              color: R.colors.grey, borderRadius: BorderRadius.circular(10)),
-          child: Image.asset(R.assets.icAtom),
-        ),
-        SizedBox(
-          width: 6,
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Nama Matakuliah",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              Text(
-                "Kode Matakuliah",
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: R.colors.greySubtitleHome),
-              ),
-              Text(
-                "Hari, JamMul - JamSel",
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: R.colors.greySubtitleHome),
-              ),
-              SizedBox(height: 5),
-              Text(
-                "Nama Dosen",
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: R.colors.greySubtitleHome),
-              ),
-            ],
-          ),
-        )
-      ]),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: BoxDecoration(
+//           color: Colors.white, borderRadius: BorderRadius.circular(10)),
+//       margin: EdgeInsets.only(bottom: 10),
+//       padding: EdgeInsets.symmetric(horizontal: 18, vertical: 21),
+//       child: Row(children: [
+//         Container(
+//           height: 53,
+//           width: 53,
+//           padding: EdgeInsets.all(13),
+//           decoration: BoxDecoration(
+//               color: R.colors.grey, borderRadius: BorderRadius.circular(10)),
+//           child: Image.asset(R.assets.icAtom),
+//         ),
+//         SizedBox(
+//           width: 6,
+//         ),
+//         Expanded(
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Text(
+//                 "Nama Matakuliah",
+//                 style: TextStyle(
+//                   fontWeight: FontWeight.bold,
+//                   fontSize: 14,
+//                 ),
+//               ),
+//               Text(
+//                 "Kode Matakuliah",
+//                 style: TextStyle(
+//                     fontWeight: FontWeight.w500,
+//                     fontSize: 12,
+//                     color: R.colors.greySubtitleHome),
+//               ),
+//               Text(
+//                 "Hari, JamMul - JamSel",
+//                 style: TextStyle(
+//                     fontWeight: FontWeight.w500,
+//                     fontSize: 12,
+//                     color: R.colors.greySubtitleHome),
+//               ),
+//               SizedBox(height: 5),
+//               Text(
+//                 "Nama Dosen",
+//                 style: TextStyle(
+//                     fontWeight: FontWeight.w500,
+//                     fontSize: 12,
+//                     color: R.colors.greySubtitleHome),
+//               ),
+//             ],
+//           ),
+//         )
+//       ]),
+//     );
+//   }
+// }
