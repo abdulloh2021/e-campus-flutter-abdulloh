@@ -1,43 +1,10 @@
 import 'dart:convert';
+import 'package:flutter_ecampus/models/jadwals.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_ecampus/constants/r.dart';
-
-import 'package:flutter_ecampus/models/jadwals.dart';
-import 'package:flutter_ecampus/services/services.dart';
 import 'package:flutter_ecampus/view/main/jadwal/jadwal_detail_page.dart';
-import 'package:flutter_ecampus/view/main/latihan_soal/home_page.dart';
-import 'package:flutter_ecampus/view/main/latihan_soal/paket_soal_page.dart';
-
-// class JadwalPage extends StatelessWidget {
-//   const JadwalPage({Key? key}) : super(key: key);
-//   static String route = "jadwal_page";
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Jadwal"),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.symmetric(
-//           vertical: 8.0,
-//           horizontal: 20,
-//         ),
-//         child: ListView.builder(
-//           itemBuilder: (context, index) {
-//             return GestureDetector(
-//                 onTap: () {
-//                   Navigator.of(context).pushNamed(JadwalDetailPage.route);
-//                 },
-//                 child: JadwalWidget());
-//           },
-//           itemCount: 4,
-//         ),
-//       ),
-//     );
-//   }
-// }
+import 'package:shimmer/shimmer.dart';
 
 class JadwalPage extends StatefulWidget {
   final String dataKeyNim;
@@ -52,10 +19,8 @@ class JadwalPage extends StatefulWidget {
 }
 
 class _JadwalPageState extends State<JadwalPage> {
-  //_get berfungsi untuk menampung data dari internet nanti
-  List getJadwals = [];
-  // String dataNim = widget.dataKeyNim;
-
+  Map<String, dynamic>? responseApi;
+  Jadwals? parsedJadwalsResponse;
   @override
   void initState() {
     // ignore: todo
@@ -68,17 +33,13 @@ class _JadwalPageState extends State<JadwalPage> {
   Future getDataJadwalsByEmail() async {
     try {
       final response = await http.get(Uri.parse(
-          // "https://newsapi.org/v2/top-headlines?country=id&category=business&apiKey=${apikey}"
-          // "https://mocki.io/v1/${widget.dataKeyNim}"
           "https://ecampus-flutter.000webhostapp.com/jadwal/${widget.dataKeyNim}/${widget.dataKeySemester}"));
-
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
+        responseApi = jsonDecode(response.body);
         setState(() {
-          //memasukan data yang di dapat dari internet ke variabel _get
-          getJadwals = data['data'];
+          //memasukan data yang di dapat dari internet ke variabel parsedJadwalsResponse
+          parsedJadwalsResponse = Jadwals.fromJson(responseApi!);
         });
       }
     } catch (e) {
@@ -94,95 +55,246 @@ class _JadwalPageState extends State<JadwalPage> {
           title: Text("Jadwal"),
           centerTitle: true,
         ),
-        body: ListView.builder(
-          // itemcount adalah total panjang data yang ingin ditampilkan
-          // _get.length adalah total panjang data dari data berita yang diambil
-          itemCount: getJadwals.length,
+        body:
+            // parsedJadwalsResponse == null
+            //     ? Center(
+            //         child: CircularProgressIndicator(),
+            //       )
+            //     :
+            parsedJadwalsResponse == null
+                ? ListView.builder(
+                    // itemcount adalah total panjang data yang ingin ditampilkan
+                    // _get.length adalah total panjang data dari data berita yang diambil
+                    itemCount: parsedJadwalsResponse?.data?.length,
 
-          // itembuilder adalah bentuk widget yang akan ditampilkan, wajib menggunakan 2 parameter.
-          itemBuilder: (context, index) {
-            //padding digunakan untuk memberikan jarak bagian atas listtile agar tidak terlalu mepet
-            //menggunakan edgeInsets.only untuk membuat jarak hanya pada bagian atas saja
-            return GestureDetector(
-                onTap: () {
-                  // Navigator.of(context).pushNamed(JadwalDetailPage.route);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => JadwalDetailPage(
-                                dataKeyNim: getJadwals[index]['nim'],
-                                dataKeySemester: getJadwals[index]['semester'],
-                                dataKeyKodeMatkul: getJadwals[index]
-                                    ['id_jadwal_mata_kuliah'],
-                              )));
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                  margin: EdgeInsets.only(bottom: 10),
-                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 21),
-                  child: Row(children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      width: 53,
-                      height: 53,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: NetworkImage(getJadwals[index]['foto'] ??
-                                "https://cdn.pixabay.com/photo/2018/03/17/20/51/white-buildings-3235135__340.jpg"),
-                            // image: AssetImage(R.assets.imgUser),
-                            fit: BoxFit.cover),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 6,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            getJadwals[index]['nama_matkul'] ?? "Nama Matkul",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            getJadwals[index]['kode_matkul'] ?? "Kode Matkul",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: R.colors.greySubtitleHome),
-                          ),
-                          Text(
-                            getJadwals[index]['hari'] +
-                                    ", " +
-                                    getJadwals[index]['jam_mulai'] +
-                                    " - " +
-                                    getJadwals[index]['jam_selesai'] ??
-                                "Hari, JamMul - JamSel",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: R.colors.greySubtitleHome),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            getJadwals[index]['nama_dosen'] ?? "Nama Dosen",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: R.colors.greySubtitleHome),
-                          ),
-                        ],
-                      ),
-                    )
-                  ]),
-                ));
-          },
-        ));
+                    // itembuilder adalah bentuk widget yang akan ditampilkan, wajib menggunakan 2 parameter.
+                    itemBuilder: (context, index) {
+                      //padding digunakan untuk memberikan jarak bagian atas listtile agar tidak terlalu mepet
+                      //menggunakan edgeInsets.only untuk membuat jarak hanya pada bagian atas saja
+                      return GestureDetector(
+                          onTap: () {
+                            // Navigator.of(context).pushNamed(JadwalDetailPage.route);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => JadwalDetailPage(
+                                          dataKeyNim:
+                                              '${parsedJadwalsResponse!.data?[index].nim}',
+                                          dataKeySemester:
+                                              '${parsedJadwalsResponse!.data?[index].semester}',
+                                          dataKeyKodeMatkul:
+                                              '${parsedJadwalsResponse!.data?[index].idJadwalMataKuliah}',
+                                        )));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 18, vertical: 21),
+                            child: Row(children: [
+                              // Container(
+                              //   margin: EdgeInsets.all(10),
+                              //   width: 53,
+                              //   height: 53,
+                              //   decoration: BoxDecoration(
+                              //     shape: BoxShape.circle,
+                              //     image: DecorationImage(
+                              //         image: NetworkImage(
+                              //             '${parsedJadwalsResponse?.data?[index].foto}'),
+                              //         // image: AssetImage(R.assets.imgUser),
+                              //         fit: BoxFit.cover),
+                              //   ),
+                              // ),
+                              Container(
+                                margin: EdgeInsets.all(10),
+                                child: Shimmer.fromColors(
+                                  baseColor: Colors.black12,
+                                  highlightColor:
+                                      Color.fromARGB(20, 245, 245, 245),
+                                  period: Duration(seconds: 2),
+                                  child: Container(
+                                    width: 53,
+                                    height: 53,
+                                    decoration: ShapeDecoration(
+                                        color: Colors.grey[100]!,
+                                        shape: CircleBorder()),
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(
+                                width: 6,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Shimmer.fromColors(
+                                      baseColor:
+                                          Color(0xff182543).withOpacity(.5),
+                                      highlightColor:
+                                          Color.fromARGB(20, 245, 245, 245),
+                                      period: Duration(seconds: 2),
+                                      child: Container(
+                                        width: 200,
+                                        height: 14,
+                                        decoration: ShapeDecoration(
+                                            color: Colors.grey[100]!,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5))),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Shimmer.fromColors(
+                                      baseColor: Colors.black12,
+                                      highlightColor:
+                                          Color.fromARGB(20, 245, 245, 245),
+                                      period: Duration(seconds: 2),
+                                      child: Container(
+                                        width: 60,
+                                        height: 12,
+                                        decoration: ShapeDecoration(
+                                            color: Colors.grey[100]!,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5))),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Shimmer.fromColors(
+                                      baseColor: Colors.black12,
+                                      highlightColor:
+                                          Color.fromARGB(20, 245, 245, 245),
+                                      period: Duration(seconds: 2),
+                                      child: Container(
+                                        width: 80,
+                                        height: 12,
+                                        decoration: ShapeDecoration(
+                                            color: Colors.grey[100]!,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5))),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Shimmer.fromColors(
+                                      baseColor: Colors.black12,
+                                      highlightColor:
+                                          Color.fromARGB(20, 245, 245, 245),
+                                      period: Duration(seconds: 2),
+                                      child: Container(
+                                        width: 140,
+                                        height: 12,
+                                        decoration: ShapeDecoration(
+                                            color: Colors.grey[100]!,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5))),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ]),
+                          ));
+                    },
+                  )
+                : ListView.builder(
+                    // itemcount adalah total panjang data yang ingin ditampilkan
+                    // _get.length adalah total panjang data dari data berita yang diambil
+                    itemCount: parsedJadwalsResponse?.data?.length,
+
+                    // itembuilder adalah bentuk widget yang akan ditampilkan, wajib menggunakan 2 parameter.
+                    itemBuilder: (context, index) {
+                      //padding digunakan untuk memberikan jarak bagian atas listtile agar tidak terlalu mepet
+                      //menggunakan edgeInsets.only untuk membuat jarak hanya pada bagian atas saja
+                      return GestureDetector(
+                          onTap: () {
+                            // Navigator.of(context).pushNamed(JadwalDetailPage.route);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => JadwalDetailPage(
+                                          dataKeyNim:
+                                              '${parsedJadwalsResponse!.data?[index].nim}',
+                                          dataKeySemester:
+                                              '${parsedJadwalsResponse!.data?[index].semester}',
+                                          dataKeyKodeMatkul:
+                                              '${parsedJadwalsResponse!.data?[index].idJadwalMataKuliah}',
+                                        )));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 18, vertical: 21),
+                            child: Row(children: [
+                              Container(
+                                margin: EdgeInsets.all(10),
+                                width: 53,
+                                height: 53,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: NetworkImage(
+                                          '${parsedJadwalsResponse?.data?[index].foto}'),
+                                      // image: AssetImage(R.assets.imgUser),
+                                      fit: BoxFit.cover),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 6,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${parsedJadwalsResponse?.data?[index].namaMatkul}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${parsedJadwalsResponse?.data?[index].kodeMatkul}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: R.colors.greySubtitleHome),
+                                    ),
+                                    Text(
+                                      '${parsedJadwalsResponse?.data?[index].hari}' +
+                                          ", " +
+                                          '${parsedJadwalsResponse?.data?[index].jamMulai}' +
+                                          " - " +
+                                          '${parsedJadwalsResponse?.data?[index].jamSelesai}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: R.colors.greySubtitleHome),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${parsedJadwalsResponse?.data?[index].namaDosen}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: R.colors.greySubtitleHome),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ]),
+                          ));
+                    },
+                  ));
   }
 }

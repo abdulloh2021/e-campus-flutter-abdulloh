@@ -10,16 +10,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
   final String dataKeyNim;
   final String dataKeySemester;
-  // final String dataKeyHari;
+
   const HomePage({
     Key? key,
     required this.dataKeyNim,
     required this.dataKeySemester,
-    // required this.dataKeyHari
   }) : super(key: key);
 
   @override
@@ -31,51 +31,59 @@ class _HomePageState extends State<HomePage> {
   static final DateFormat formatter =
       DateFormat('EEEE'); //data format for day (Monday, Tuesday, etc)
   final String Hari = formatter.format(now); //get day dari hasil format Hari
-  //_get berfungsi untuk menampung data dari internet nanti
-  List getJadwals = [];
 
-  Users? userProfile;
-  void getDataUser() async {
-    Users? hasilUsers =
-        await Services.getUsersById(widget.dataKeyNim); //get data user
-    if (hasilUsers != null) {
-      //jika hasilUsers tidak kosong
-      setState(() {
-        //set state untuk menampilkan data user
-        userProfile = hasilUsers; //set userProfile dengan hasilUsers
-      });
+  Map<String, dynamic>? responseApi;
+  Map<String, dynamic>? responseApiJadwals;
+  Jadwals? parsedJadwalsResponse;
+  Users? parsedUsersResponse;
+  Future getDataUsersByNim() async {
+    try {
+      final response = await http.get(Uri.parse(
+          "https://ecampus-flutter.000webhostapp.com/mahasiswa/${widget.dataKeyNim}"));
+
+      // cek apakah respon berhasil
+      if (response.statusCode == 200) {
+        responseApi = jsonDecode(response.body);
+
+        setState(() {
+          //memasukan data yang di dapat dari internet ke variabel _get
+          parsedUsersResponse = Users.fromJson(responseApi!);
+        });
+      }
+    } catch (e) {
+      //tampilkan error di terminal
+      print(e);
     }
-  } //end getDataUser
+  }
+
+  Future getDataJadwalsByNimBySemesterByHari() async {
+    try {
+      final response = await http.get(Uri.parse(
+          "https://ecampus-flutter.000webhostapp.com/jadwalweek/${widget.dataKeyNim}/${widget.dataKeySemester}/" +
+              Hari +
+              ""));
+
+      // cek apakah respon berhasil
+      if (response.statusCode == 200) {
+        responseApi = jsonDecode(response.body);
+
+        setState(() {
+          //memasukan data yang di dapat dari internet ke variabel _get
+          parsedJadwalsResponse = Jadwals.fromJson(responseApi!);
+        });
+      }
+    } catch (e) {
+      //tampilkan error di terminal
+      print(e);
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState(); //super initState
-    getDataUser(); //get data user
-    getDataJadwalsByEmail(); //get data jadwal
-  }
-
-  //method untuk merequest/mengambil data dari internet
-  Future getDataJadwalsByEmail() async {
-    try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/jadwalweek/${widget.dataKeyNim}/${widget.dataKeySemester}/" +
-              Hari +
-              "")); //get data jadwal by email, semester dan hari
-
-      // cek apakah respon berhasil
-      if (response.statusCode == 200) {
-        //jika berhasil
-        final data = jsonDecode(response.body); //get data dari response
-        setState(() {
-          //memasukan data yang di dapat dari internet ke variabel _get
-          getJadwals = data['data']; //set getJadwals dengan data dari response
-        });
-      }
-    } catch (e) {
-      //tampilkan error di terminal
-      print(e); //end print
-    }
+    getDataUsersByNim(); //get data user
+    getDataJadwalsByNimBySemesterByHari(); //get data jadwal
   }
 
   @override
@@ -87,7 +95,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             _buildUserHomeProfile(), //memanggil method _buildUserHomeProfile
             _buildTopBanner(context), //memanggil method _buildTopBanner
-            _buildHomeListMapel(), //memanggil method _buildHomeListMapel
+            buildHomeListMapel(), //memanggil method _buildHomeListMapel
             Container(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +122,6 @@ class _HomePageState extends State<HomePage> {
                         return Container(
                           margin: EdgeInsets.symmetric(
                             horizontal: 20.0,
-                            // vertical: 15,
                           ),
                           decoration: BoxDecoration(
                               color: R.colors.primary,
@@ -179,7 +186,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Container _buildHomeListMapel() {
+  Container buildHomeListMapel() {
     //method untuk menampilkan list mapel
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 21),
@@ -217,110 +224,225 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
               height: 250,
-              child: ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                // itemcount adalah total panjang data yang ingin ditampilkan
-                // _get.length adalah total panjang data dari data berita yang diambil
-                itemCount: getJadwals.length,
-
-                // itembuilder adalah bentuk widget yang akan ditampilkan, wajib menggunakan 2 parameter.
-                itemBuilder: (context, index) {
-                  //padding digunakan untuk memberikan jarak bagian atas listtile agar tidak terlalu mepet
-                  //menggunakan edgeInsets.only untuk membuat jarak hanya pada bagian atas saja
-                  return GestureDetector(
-                      onTap: () {
-                        // Navigator.of(context).pushNamed(JadwalDetailPage.route);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => JadwalDetailPage(
-                                      dataKeyNim: widget.dataKeyNim,
-                                      dataKeySemester: widget.dataKeySemester,
-                                      dataKeyKodeMatkul: getJadwals[index]
-                                              ['id_jadwal_mata_kuliah'] ??
-                                          "Id Jadwal Matkul",
-                                    )));
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 18, vertical: 21),
-                        child: Row(children: [
-                          Container(
-                            margin: EdgeInsets.all(10),
-                            width: 53,
-                            height: 53,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image: NetworkImage(getJadwals[index]
-                                          ['foto'] ??
-                                      "https://cdn.pixabay.com/photo/2018/03/17/20/51/white-buildings-3235135__340.jpg"),
-                                  // image: AssetImage(R.assets.imgUser),
-                                  fit: BoxFit.cover),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 6,
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  getJadwals[index]['nama_matkul'] ??
-                                      "Nama Matkul",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+              child: parsedJadwalsResponse == null
+                  ? ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: parsedJadwalsResponse?.data?.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => JadwalDetailPage(
+                                            dataKeyNim:
+                                                '${parsedJadwalsResponse!.data?[index].nim}',
+                                            dataKeySemester:
+                                                '${parsedJadwalsResponse!.data?[index].semester}',
+                                            dataKeyKodeMatkul:
+                                                '${parsedJadwalsResponse!.data?[index].idJadwalMataKuliah}',
+                                          )));
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10)),
+                              margin: EdgeInsets.only(bottom: 10),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 21),
+                              child: Row(children: [
+                                Container(
+                                  margin: EdgeInsets.all(10),
+                                  child: Shimmer.fromColors(
+                                    baseColor: Colors.black12,
+                                    highlightColor:
+                                        Color.fromARGB(20, 245, 245, 245),
+                                    period: Duration(seconds: 2),
+                                    child: Container(
+                                      width: 53,
+                                      height: 53,
+                                      decoration: ShapeDecoration(
+                                          color: Colors.grey[100]!,
+                                          shape: CircleBorder()),
+                                    ),
                                   ),
                                 ),
-                                Text(
-                                  getJadwals[index]['kode_matkul'] ??
-                                      "Kode Matkul",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 8,
-                                      color: R.colors.greySubtitleHome),
+                                SizedBox(
+                                  width: 6,
                                 ),
-                                Text(
-                                  getJadwals[index]['hari'] +
-                                          ", " +
-                                          getJadwals[index]['jam_mulai'] +
-                                          " - " +
-                                          getJadwals[index]['jam_selesai'] ??
-                                      "Hari, JamMul - JamSel",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 8,
-                                      color: R.colors.greySubtitleHome),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Shimmer.fromColors(
+                                        baseColor:
+                                            Color(0xff182543).withOpacity(.5),
+                                        highlightColor:
+                                            Color.fromARGB(20, 245, 245, 245),
+                                        period: Duration(seconds: 2),
+                                        child: Container(
+                                          width: 200,
+                                          height: 14,
+                                          decoration: ShapeDecoration(
+                                              color: Colors.grey[100]!,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5))),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Shimmer.fromColors(
+                                        baseColor: Colors.black12,
+                                        highlightColor:
+                                            Color.fromARGB(20, 245, 245, 245),
+                                        period: Duration(seconds: 2),
+                                        child: Container(
+                                          width: 60,
+                                          height: 12,
+                                          decoration: ShapeDecoration(
+                                              color: Colors.grey[100]!,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5))),
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Shimmer.fromColors(
+                                        baseColor: Colors.black12,
+                                        highlightColor:
+                                            Color.fromARGB(20, 245, 245, 245),
+                                        period: Duration(seconds: 2),
+                                        child: Container(
+                                          width: 80,
+                                          height: 12,
+                                          decoration: ShapeDecoration(
+                                              color: Colors.grey[100]!,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5))),
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Shimmer.fromColors(
+                                        baseColor: Colors.black12,
+                                        highlightColor:
+                                            Color.fromARGB(20, 245, 245, 245),
+                                        period: Duration(seconds: 2),
+                                        child: Container(
+                                          width: 140,
+                                          height: 12,
+                                          decoration: ShapeDecoration(
+                                              color: Colors.grey[100]!,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5))),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ]),
+                            ));
+                      },
+                    )
+                  : ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: parsedJadwalsResponse?.data?.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => JadwalDetailPage(
+                                            dataKeyNim: widget.dataKeyNim,
+                                            dataKeySemester:
+                                                widget.dataKeySemester,
+                                            dataKeyKodeMatkul:
+                                                '${parsedJadwalsResponse?.data?[index].idJadwalMataKuliah}',
+                                          )));
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10)),
+                              margin: EdgeInsets.only(bottom: 10),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 21),
+                              child: Row(children: [
+                                Container(
+                                  margin: EdgeInsets.all(10),
+                                  width: 53,
+                                  height: 53,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                        image: NetworkImage(
+                                            '${parsedJadwalsResponse?.data?[index].foto}'),
+                                        fit: BoxFit.cover),
+                                  ),
                                 ),
-                                SizedBox(height: 5),
-                                Text(
-                                  getJadwals[index]['nama_dosen'] ??
-                                      "Nama Dosen",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 9,
-                                      color: R.colors.greySubtitleHome),
+                                SizedBox(
+                                  width: 6,
                                 ),
-                              ],
-                            ),
-                          )
-                        ]),
-                      ));
-                },
-              )),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${parsedJadwalsResponse?.data?[index].namaMatkul}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${parsedJadwalsResponse?.data?[index].kodeMatkul}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 8,
+                                            color: R.colors.greySubtitleHome),
+                                      ),
+                                      Text(
+                                        '${parsedJadwalsResponse?.data?[index].hari}' +
+                                            ", " +
+                                            '${parsedJadwalsResponse?.data?[index].jamMulai}' +
+                                            " - " +
+                                            '${parsedJadwalsResponse?.data?[index].jamSelesai}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 8,
+                                            color: R.colors.greySubtitleHome),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        '${parsedJadwalsResponse?.data?[index].namaDosen}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 9,
+                                            color: R.colors.greySubtitleHome),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ]),
+                            ));
+                      },
+                    )),
         ],
       ),
     );
   }
 
   Container _buildTopBanner(BuildContext context) {
-    //method untuk menampilkan banner atas
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 20.0,
@@ -381,111 +503,98 @@ class _HomePageState extends State<HomePage> {
   }
 
   Padding _buildUserHomeProfile() {
-    //method untuk menampilkan profile user
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 20.0,
         vertical: 15,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: parsedUsersResponse == null
+          ? Row(
               children: [
-                Text(
-                  "Hi, ${userProfile?.data?[0].nama} ",
-                  style: GoogleFonts.poppins()
-                      .copyWith(fontSize: 12, fontWeight: FontWeight.w700),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Shimmer.fromColors(
+                        baseColor: Colors.black12,
+                        highlightColor: Color.fromARGB(20, 245, 245, 245),
+                        period: Duration(seconds: 2),
+                        child: Container(
+                          width: 140,
+                          height: 12,
+                          decoration: ShapeDecoration(
+                              color: Colors.grey[100]!,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5))),
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Shimmer.fromColors(
+                        baseColor: Colors.black12,
+                        highlightColor: Color.fromARGB(20, 245, 245, 245),
+                        period: Duration(seconds: 2),
+                        child: Container(
+                          width: 60,
+                          height: 12,
+                          decoration: ShapeDecoration(
+                              color: Colors.grey[100]!,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5))),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  "${userProfile?.data?[0].nim}",
-                  style: GoogleFonts.poppins().copyWith(
-                    fontSize: 12,
-                    // fontWeight: FontWeight.w700,
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.black12,
+                    highlightColor: Color.fromARGB(20, 245, 245, 245),
+                    period: Duration(seconds: 2),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: ShapeDecoration(
+                          color: Colors.grey[100]!, shape: CircleBorder()),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Hi, ${parsedUsersResponse?.data?[0].nama} ",
+                        style: GoogleFonts.poppins().copyWith(
+                            fontSize: 12, fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        "${parsedUsersResponse?.data?[0].nim}",
+                        style: GoogleFonts.poppins().copyWith(
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        image: NetworkImage(
+                            '${parsedUsersResponse?.data?[0].foto}'),
+                        fit: BoxFit.cover),
                   ),
                 ),
               ],
             ),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                  image: NetworkImage('${userProfile?.data?[0].foto}'),
-                  fit: BoxFit.cover),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
-
-// class JadwalWidget extends StatelessWidget { //widget untuk menampilkan jadwal
-//   const JadwalWidget({
-//     Key? key,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//           color: Colors.white, borderRadius: BorderRadius.circular(10)),
-//       margin: EdgeInsets.only(bottom: 10),
-//       padding: EdgeInsets.symmetric(horizontal: 18, vertical: 21),
-//       child: Row(children: [
-//         Container(
-//           height: 53,
-//           width: 53,
-//           padding: EdgeInsets.all(13),
-//           decoration: BoxDecoration(
-//               color: R.colors.grey, borderRadius: BorderRadius.circular(10)),
-//           child: Image.asset(R.assets.icAtom),
-//         ),
-//         SizedBox(
-//           width: 6,
-//         ),
-//         Expanded(
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Text(
-//                 "Nama Matakuliah",
-//                 style: TextStyle(
-//                   fontWeight: FontWeight.bold,
-//                   fontSize: 14,
-//                 ),
-//               ),
-//               Text(
-//                 "Kode Matakuliah",
-//                 style: TextStyle(
-//                     fontWeight: FontWeight.w500,
-//                     fontSize: 12,
-//                     color: R.colors.greySubtitleHome),
-//               ),
-//               Text(
-//                 "Hari, JamMul - JamSel",
-//                 style: TextStyle(
-//                     fontWeight: FontWeight.w500,
-//                     fontSize: 12,
-//                     color: R.colors.greySubtitleHome),
-//               ),
-//               SizedBox(height: 5),
-//               Text(
-//                 "Nama Dosen",
-//                 style: TextStyle(
-//                     fontWeight: FontWeight.w500,
-//                     fontSize: 12,
-//                     color: R.colors.greySubtitleHome),
-//               ),
-//             ],
-//           ),
-//         )
-//       ]),
-//     );
-//   }
-// }

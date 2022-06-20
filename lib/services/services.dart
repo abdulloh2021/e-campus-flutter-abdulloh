@@ -69,17 +69,17 @@ abstract class Services {
     }
   }
 
-  static Future<Dosens?> getDosens() async {
-    try {
-      var response =
-          await Dio().get("https://ecampus-flutter.000webhostapp.com/dosen");
-      if (response.statusCode == 200) {
-        return Dosens.fromJson(response.data);
-      }
-    } catch (e) {
-      throw Exception(e.toString());
-    }
-  }
+  // static Future<Dosens?> getDosens() async {
+  //   try {
+  //     var response =
+  //         await Dio().get("https://ecampus-flutter.000webhostapp.com/dosen");
+  //     if (response.statusCode == 200) {
+  //       return Dosens.fromJson(response.data);
+  //     }
+  //   } catch (e) {
+  //     throw Exception(e.toString());
+  //   }
+  // }
 
   static Future<DosenDetail?> getDosenDetailByKodeDosen(String key) async {
     try {

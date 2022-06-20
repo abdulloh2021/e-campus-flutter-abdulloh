@@ -1,13 +1,15 @@
-import 'dart:developer';
-
+import 'dart:convert';
+// import 'dart:developer';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter_ecampus/constants/r.dart';
 import 'package:flutter_ecampus/models/jadwal_detail.dart';
-import 'package:flutter_ecampus/models/jadwals.dart';
-import 'package:flutter_ecampus/services/services.dart';
-import 'package:flutter_ecampus/view/login_page.dart';
+// import 'package:flutter_ecampus/models/jadwals.dart';
+// import 'package:flutter_ecampus/services/services.dart';
+// import 'package:flutter_ecampus/view/login_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class JadwalDetailPage extends StatefulWidget {
@@ -26,16 +28,27 @@ class JadwalDetailPage extends StatefulWidget {
 }
 
 class _JadwalDetailPageState extends State<JadwalDetailPage> {
-  JadwalDetail? jadwalDetail;
-  // Users? lokalProfile;
-  void getDataJadwalDetail() async {
-    JadwalDetail? hasilJadwalDetail =
-        await Services.getJadwalDetailByKodeMatkul(widget.dataKeyNim,
-            widget.dataKeySemester, widget.dataKeyKodeMatkul); //get data user
-    if (hasilJadwalDetail != null) {
-      setState(() {
-        jadwalDetail = hasilJadwalDetail;
-      });
+  Map<String, dynamic>? responseApi;
+  JadwalDetail? parsedJadwalDetailResponse;
+
+  Future getDataJadwalsByNimBySemesterByKodeMatkul() async {
+    try {
+      final response = await http.get(Uri.parse(
+          "https://ecampus-flutter.000webhostapp.com/jadwal/${widget.dataKeyNim}/${widget.dataKeySemester}/${widget.dataKeyKodeMatkul}"));
+
+      // cek apakah respon berhasil
+      if (response.statusCode == 200) {
+        responseApi = jsonDecode(response.body);
+
+        setState(() {
+          //memasukan data yang di dapat dari internet ke variabel _get
+          // getJadwals = data['data'];
+          parsedJadwalDetailResponse = JadwalDetail.fromJson(responseApi!);
+        });
+      }
+    } catch (e) {
+      //tampilkan error di terminal
+      print(e);
     }
   }
 
@@ -43,7 +56,7 @@ class _JadwalDetailPageState extends State<JadwalDetailPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getDataJadwalDetail();
+    getDataJadwalsByNimBySemesterByKodeMatkul();
   }
 
   @override
@@ -51,11 +64,11 @@ class _JadwalDetailPageState extends State<JadwalDetailPage> {
     final Uri toLaunchMeet = Uri(
         scheme: 'https',
         host: 'meet.google.com',
-        path: '${jadwalDetail?.data?[0].linkMeet}');
+        path: '${parsedJadwalDetailResponse?.data?[0].linkMeet}');
     final Uri toLaunchClassroom = Uri(
         scheme: 'https',
         host: 'classroom.google.com',
-        path: 'u/0/c/${jadwalDetail?.data?[0].linkClassroom}');
+        path: 'u/0/c/${parsedJadwalDetailResponse?.data?[0].linkClassroom}');
     // https://meet.google.com/ivp-cyzg-yiu?authuser=0
     Future<void>? _launched;
     Future<void> _launchInBrowser(Uri url) async {
@@ -69,7 +82,8 @@ class _JadwalDetailPageState extends State<JadwalDetailPage> {
 
     void showToast() {
       Fluttertoast.showToast(
-          msg: 'Nomor Rekening Tersalin ${jadwalDetail?.data?[0].linkMeet}',
+          msg:
+              'Nomor Rekening Tersalin ${parsedJadwalDetailResponse!.data?[0].linkMeet}',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           // timeInSecForIos: 1,
@@ -94,140 +108,264 @@ class _JadwalDetailPageState extends State<JadwalDetailPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Container(
-              width: double.infinity,
-              height: 400,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10), color: Colors.white),
-              // margin: const EdgeInsets.all(13.0),
-              padding: const EdgeInsets.only(
-                left: 13.0,
-                right: 13.0,
-                top: 40,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.all(10),
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image:
-                                NetworkImage('${jadwalDetail?.data?[0].foto}'),
-                            // image: AssetImage(R.assets.imgUser),
-                            fit: BoxFit.cover),
-                      ),
+            parsedJadwalDetailResponse == null
+                ? Container(
+                    width: double.infinity,
+                    height: 400,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white),
+                    // margin: const EdgeInsets.all(13.0),
+                    padding: const EdgeInsets.only(
+                      left: 13.0,
+                      right: 13.0,
+                      top: 40,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.all(10),
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.black12,
+                              highlightColor: Color.fromARGB(20, 245, 245, 245),
+                              period: Duration(seconds: 2),
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                decoration: ShapeDecoration(
+                                    color: Colors.grey[100]!,
+                                    shape: CircleBorder()),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Center(
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.black12,
+                            highlightColor: Color.fromARGB(20, 245, 245, 245),
+                            period: Duration(seconds: 2),
+                            child: Container(
+                              width: 140,
+                              height: 14,
+                              decoration: ShapeDecoration(
+                                  color: Colors.grey[100]!,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5))),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Center(
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.black12,
+                            highlightColor: Color.fromARGB(20, 245, 245, 245),
+                            period: Duration(seconds: 2),
+                            child: Container(
+                              width: 100,
+                              height: 14,
+                              decoration: ShapeDecoration(
+                                  color: Colors.grey[100]!,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5))),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Hari",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        SizedBox(height: 5),
+                        Shimmer.fromColors(
+                          baseColor: Colors.black12,
+                          highlightColor: Color.fromARGB(20, 245, 245, 245),
+                          period: Duration(seconds: 2),
+                          child: Container(
+                            width: 180,
+                            height: 14,
+                            decoration: ShapeDecoration(
+                                color: Colors.grey[100]!,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5))),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Dosen",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        SizedBox(height: 5),
+                        Shimmer.fromColors(
+                          baseColor: Colors.black12,
+                          highlightColor: Color.fromARGB(20, 245, 245, 245),
+                          period: Duration(seconds: 2),
+                          child: Container(
+                            width: 220,
+                            height: 14,
+                            decoration: ShapeDecoration(
+                                color: Colors.grey[100]!,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5))),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Email",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        SizedBox(height: 5),
+                        Shimmer.fromColors(
+                          baseColor: Colors.black12,
+                          highlightColor: Color.fromARGB(20, 245, 245, 245),
+                          period: Duration(seconds: 2),
+                          child: Container(
+                            width: 240,
+                            height: 14,
+                            decoration: ShapeDecoration(
+                                color: Colors.grey[100]!,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5))),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Ruangan",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        SizedBox(height: 5),
+                        Shimmer.fromColors(
+                          baseColor: Colors.black12,
+                          highlightColor: Color.fromARGB(20, 245, 245, 245),
+                          period: Duration(seconds: 2),
+                          child: Container(
+                            width: 50,
+                            height: 14,
+                            decoration: ShapeDecoration(
+                                color: Colors.grey[100]!,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5))),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(
+                    width: double.infinity,
+                    height: 400,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white),
+                    // margin: const EdgeInsets.all(13.0),
+                    padding: const EdgeInsets.only(
+                      left: 13.0,
+                      right: 13.0,
+                      top: 40,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.all(10),
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                      '${parsedJadwalDetailResponse?.data?[0].foto}'),
+                                  // image: AssetImage(R.assets.imgUser),
+                                  fit: BoxFit.cover),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Center(
+                          child: Text(
+                            "${parsedJadwalDetailResponse?.data?[0].namaMatkul}", // Nama Matkul
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Text(
+                            "${parsedJadwalDetailResponse?.data?[0].kodeMatkul}", // Nama Matkul
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          "Hari",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        Text(
+                          "${parsedJadwalDetailResponse?.data?[0].hari} ${parsedJadwalDetailResponse?.data?[0].jamMulai} - ${parsedJadwalDetailResponse?.data?[0].jamSelesai}", // Hari Matkul
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "Dosen",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        Text(
+                          "${parsedJadwalDetailResponse?.data?[0].namaDosen}", // Hari Matkul
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "Email",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        Text(
+                          "${parsedJadwalDetailResponse?.data?[0].email}", // Hari Matkul
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "Ruangan",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                              color: R.colors.greySubtitleHome),
+                        ),
+                        Text(
+                          "${parsedJadwalDetailResponse?.data?[0].semester}", // Hari Matkul
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Center(
-                    child: Text(
-                      "${jadwalDetail?.data?[0].namaMatkul}", // Nama Matkul
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      "${jadwalDetail?.data?[0].kodeMatkul}", // Nama Matkul
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    "Hari",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 9,
-                        color: R.colors.greySubtitleHome),
-                  ),
-                  Text(
-                    "${jadwalDetail?.data?[0].hari} ${jadwalDetail?.data?[0].jamMulai} - ${jadwalDetail?.data?[0].jamSelesai}", // Hari Matkul
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Dosen",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 9,
-                        color: R.colors.greySubtitleHome),
-                  ),
-                  Text(
-                    "${jadwalDetail?.data?[0].namaDosen}", // Hari Matkul
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Email",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 9,
-                        color: R.colors.greySubtitleHome),
-                  ),
-                  Text(
-                    "${jadwalDetail?.data?[0].email}", // Hari Matkul
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Ruangan",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 9,
-                        color: R.colors.greySubtitleHome),
-                  ),
-                  Text(
-                    "${jadwalDetail?.data?[0].semester}", // Hari Matkul
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  // Text(
-                  //   "${jadwalDetail?.data?.linkClassroom}", // Hari Matkul
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  // ),
-                  // Text(
-                  //   "${jadwalDetail?.data?.linkMeet}", // Hari Matkul
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  // ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Clipboard.setData(ClipboardData(
-                  //         text: "${jadwalDetail?.data?.linkMeet}"));
-                  //     showToast();
-                  //   },
-                  //   child: Row(children: [
-                  //     Text(
-                  //       "${jadwalDetail?.data?.linkMeet}",
-                  //       style: TextStyle(
-                  //         color: Colors.red,
-                  //         // fontSize: 12,
-                  //       ),
-                  //     ),
-                  //     SizedBox(width: 10),
-                  //     Icon(
-                  //       Icons.content_copy,
-                  //       color: Colors.red,
-                  //     ),
-                  //   ]),
-                  // )
-                ],
-              ),
-            ),
             ButtonJadwalDetail(
               onTap: () {
                 // Navigator.of(context).pushNamed(RegisterPage.route);

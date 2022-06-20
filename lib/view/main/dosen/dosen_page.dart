@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_ecampus/constants/r.dart';
+import 'package:flutter_ecampus/models/dosens.dart';
 import 'package:flutter_ecampus/view/main/dosen/dosen_detail_page.dart';
 import 'package:flutter_ecampus/view/main/jadwal/jadwal_detail_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
 
 class DosenPage extends StatefulWidget {
   const DosenPage({Key? key}) : super(key: key);
@@ -14,39 +16,34 @@ class DosenPage extends StatefulWidget {
 }
 
 class _DosenPageState extends State<DosenPage> {
-  List getDosens = []; // list data dosen
+  // List getDosens = []; // list data dosen
+  Map<String, dynamic>? responseApi;
+  Dosens? parsedDosensResponse;
 
-  // var apikey = '936f480d-0e26-4f44-8698-0f1c2ada07c1'; // api key
-
-  @override
-  void initState() {
-    // ignore: todo
-    // TODO: implement initState
-    super.initState();
-    getDataDosens(); // get data dosen
-  }
-
-  //method untuk merequest/mengambil data dari internet
   Future getDataDosens() async {
-    // method untuk mengambil data dari internet
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/dosen")); // url dari api
+      final response = await http
+          .get(Uri.parse("https://ecampus-flutter.000webhostapp.com/dosen"));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
-        // jika berhasil
-        final data = jsonDecode(response.body); // data dari api
+        responseApi = jsonDecode(response.body);
 
         setState(() {
-          //memasukan data yang di dapat dari internet ke variabel getDosens
-          getDosens = data['data'];
+          parsedDosensResponse = Dosens.fromJson(responseApi!);
         });
       }
     } catch (e) {
       //tampilkan error di terminal
       print(e);
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getDataDosens(); // get data dosen
   }
 
   @override
@@ -57,93 +54,198 @@ class _DosenPageState extends State<DosenPage> {
           centerTitle: true,
           automaticallyImplyLeading: false,
         ),
-        body: ListView.builder(
-          // itemcount adalah total panjang data yang ingin ditampilkan
-          // _get.length adalah total panjang data dari data berita yang diambil
-          itemCount: getDosens.length,
-
-          // itembuilder adalah bentuk widget yang akan ditampilkan, wajib menggunakan 2 parameter.
-          itemBuilder: (context, index) {
-            //padding digunakan untuk memberikan jarak bagian atas listtile agar tidak terlalu mepet
-            //menggunakan edgeInsets.only untuk membuat jarak hanya pada bagian atas saja
-            return GestureDetector(
-                onTap: () {
-                  // Navigator.of(context).pushNamed(JadwalDetailPage.route);
-                  Navigator.push(
-                      // Navigator.push adalah method untuk menggunakan routing
-                      context,
-                      // JadwalDetailPage(
-                      //           dataKeyKodeMatkul:
-                      //               "c4a77af8-3555-4abb-8358-72d40721ecdc",
-                      //         )
-                      MaterialPageRoute(
-                          builder: (context) => DosenDetailPage(
-                              dataKeyKodeDosen: getDosens[index][
-                                  'id_dosen']))); // route untuk menampilkan halaman detail dosen
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                  margin: EdgeInsets.only(bottom: 10),
-                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 21),
-                  child: Row(children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      width: 53,
-                      height: 53,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: NetworkImage(getDosens[index]['foto'] ??
-                                "https://cdn.pixabay.com/photo/2018/03/17/20/51/white-buildings-3235135__340.jpg"), // url gambar
-                            // image: AssetImage(R.assets.imgUser),
-                            fit: BoxFit.cover),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 6,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            getDosens[index]['nama'] ?? "Nama Dosen",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+        body: parsedDosensResponse == null
+            ? ListView.builder(
+                itemCount: parsedDosensResponse?.data?.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DosenDetailPage(
+                                    dataKeyKodeDosen:
+                                        '${parsedDosensResponse?.data?[index].idDosen}'))); // route untuk menampilkan halaman detail dosen
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 10),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 18, vertical: 21),
+                        child: Row(children: [
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.black12,
+                              highlightColor: Color.fromARGB(20, 245, 245, 245),
+                              period: Duration(seconds: 2),
+                              child: Container(
+                                width: 53,
+                                height: 53,
+                                decoration: ShapeDecoration(
+                                    color: Colors.grey[100]!,
+                                    shape: CircleBorder()),
+                              ),
                             ),
-                          ), // nama dosen
-                          Text(
-                            getDosens[index]['nidn'] ?? "NIDN", //
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: R.colors.greySubtitleHome),
-                          ), // nidn
-                          SizedBox(height: 5),
-                          Text(
-                            getDosens[index]['email'] ?? "Email Dosen",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: R.colors.greySubtitleHome),
-                          ), // email dosen
-                          Text(
-                            getDosens[index]['nomorwhatsapp'] ??
-                                "Nomor Whatsapp",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: R.colors.greySubtitleHome),
-                          ), // nomor whatsapp
-                        ],
-                      ),
-                    )
-                  ]),
-                ));
-          },
-        ));
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Shimmer.fromColors(
+                                  baseColor: Color(0xff182543).withOpacity(.5),
+                                  highlightColor:
+                                      Color.fromARGB(20, 245, 245, 245),
+                                  period: Duration(seconds: 2),
+                                  child: Container(
+                                    width: 200,
+                                    height: 14,
+                                    decoration: ShapeDecoration(
+                                        color: Colors.grey[100]!,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5))),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Shimmer.fromColors(
+                                  baseColor: Colors.black12,
+                                  highlightColor:
+                                      Color.fromARGB(20, 245, 245, 245),
+                                  period: Duration(seconds: 2),
+                                  child: Container(
+                                    width: 60,
+                                    height: 12,
+                                    decoration: ShapeDecoration(
+                                        color: Colors.grey[100]!,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5))),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Shimmer.fromColors(
+                                  baseColor: Colors.black12,
+                                  highlightColor:
+                                      Color.fromARGB(20, 245, 245, 245),
+                                  period: Duration(seconds: 2),
+                                  child: Container(
+                                    width: 150,
+                                    height: 12,
+                                    decoration: ShapeDecoration(
+                                        color: Colors.grey[100]!,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5))),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Shimmer.fromColors(
+                                  baseColor: Colors.black12,
+                                  highlightColor:
+                                      Color.fromARGB(20, 245, 245, 245),
+                                  period: Duration(seconds: 2),
+                                  child: Container(
+                                    width: 100,
+                                    height: 12,
+                                    decoration: ShapeDecoration(
+                                        color: Colors.grey[100]!,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5))),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ]),
+                      ));
+                },
+              )
+            : ListView.builder(
+                itemCount: parsedDosensResponse?.data?.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DosenDetailPage(
+                                    dataKeyKodeDosen:
+                                        '${parsedDosensResponse?.data?[index].idDosen}'))); // route untuk menampilkan halaman detail dosen
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 10),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 18, vertical: 21),
+                        child: Row(children: [
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            width: 53,
+                            height: 53,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                      '${parsedDosensResponse?.data?[index].foto}'), // url gambar
+
+                                  fit: BoxFit.cover),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 6,
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${parsedDosensResponse?.data?[index].nama}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ), // nama dosen
+                                Text(
+                                  '${parsedDosensResponse?.data?[index].nidn}', //
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      color: R.colors.greySubtitleHome),
+                                ), // nidn
+                                SizedBox(height: 5),
+                                Text(
+                                  '${parsedDosensResponse?.data?[index].email}',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      color: R.colors.greySubtitleHome),
+                                ), // email dosen
+                                Text(
+                                  '${parsedDosensResponse?.data?[index].nomorwhatsapp}',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      color: R.colors.greySubtitleHome),
+                                ), // nomor whatsapp
+                              ],
+                            ),
+                          )
+                        ]),
+                      ));
+                },
+              ));
   }
 }

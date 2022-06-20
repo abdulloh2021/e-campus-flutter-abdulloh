@@ -44,7 +44,7 @@ dependencies:
   fluttertoast: ^8.0.9
   url_launcher: ^6.1.2
   url_encoder: ^0.0.3
-
+  shimmer: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
