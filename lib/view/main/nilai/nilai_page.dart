@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ecampus/constants/api_url.dart';
 import 'package:flutter_ecampus/constants/r.dart';
 import 'package:flutter_ecampus/models/nilai.dart';
 import 'package:flutter_ecampus/models/users.dart';
@@ -27,8 +28,8 @@ class _NilaiPageState extends State<NilaiPage> {
 
   Future getDataProfileByNim() async {
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/mahasiswa/${widget.dataKeyNim}"));
+      final response = await http
+          .get(Uri.parse(ApiUrl.baseUrl + "/mahasiswa/${widget.dataKeyNim}"));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
@@ -47,8 +48,8 @@ class _NilaiPageState extends State<NilaiPage> {
   //method untuk merequest/mengambil data dari internet
   Future getDataNilaiByNim() async {
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/krs/${widget.dataKeyNim}"));
+      final response = await http
+          .get(Uri.parse(ApiUrl.baseUrl + "/krs/${widget.dataKeyNim}"));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {

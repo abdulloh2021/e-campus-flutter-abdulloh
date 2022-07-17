@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_ecampus/constants/api_url.dart';
 import 'package:flutter_ecampus/models/jadwals.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -32,8 +33,8 @@ class _JadwalPageState extends State<JadwalPage> {
   //method untuk merequest/mengambil data dari internet
   Future getDataJadwalsByEmail() async {
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/jadwal/${widget.dataKeyNim}/${widget.dataKeySemester}"));
+      final response = await http.get(Uri.parse(ApiUrl.baseUrl +
+          "/jadwal/${widget.dataKeyNim}/${widget.dataKeySemester}"));
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
         responseApi = jsonDecode(response.body);

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:flutter_ecampus/constants/api_url.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future getDataProfileByNim() async {
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/mahasiswa/${widget.dataKey}"));
+      final response = await http
+          .get(Uri.parse(ApiUrl.baseUrl + "/mahasiswa/${widget.dataKey}"));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {

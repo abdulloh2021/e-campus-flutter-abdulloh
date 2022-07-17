@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ecampus/constants/api_url.dart';
 import 'package:flutter_ecampus/constants/r.dart';
 import 'package:flutter_ecampus/models/jadwals.dart';
 import 'package:flutter_ecampus/models/users.dart';
@@ -27,6 +28,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static String? cekDataJadwal;
   static final DateTime now = DateTime.now(); //get current date
   static final DateFormat formatter =
       DateFormat('EEEE'); //data format for day (Monday, Tuesday, etc)
@@ -38,12 +40,21 @@ class _HomePageState extends State<HomePage> {
   Users? parsedUsersResponse;
   Future getDataUsersByNim() async {
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/mahasiswa/${widget.dataKeyNim}"));
+      final response = await http
+          .get(Uri.parse(ApiUrl.baseUrl + "/mahasiswa/${widget.dataKeyNim}"));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
         responseApi = jsonDecode(response.body);
+
+        setState(() {
+          //memasukan data yang di dapat dari internet ke variabel _get
+          parsedUsersResponse = Users.fromJson(responseApi!);
+        });
+      }
+      // cek apakah respon berhasil
+      if (response.statusCode == 404) {
+        // responseApi = jsonDecode(response.body);
 
         setState(() {
           //memasukan data yang di dapat dari internet ke variabel _get
@@ -58,10 +69,10 @@ class _HomePageState extends State<HomePage> {
 
   Future getDataJadwalsByNimBySemesterByHari() async {
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/jadwalweek/${widget.dataKeyNim}/${widget.dataKeySemester}/" +
-              Hari +
-              ""));
+      final response = await http.get(Uri.parse(ApiUrl.baseUrl +
+          "/jadwalweek/${widget.dataKeyNim}/${widget.dataKeySemester}/" +
+          Hari +
+          ""));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
@@ -72,6 +83,14 @@ class _HomePageState extends State<HomePage> {
           parsedJadwalsResponse = Jadwals.fromJson(responseApi!);
         });
       }
+      // // cek apakah respon berhasil
+      // if (response.statusCode == 404) {
+      //   //  responseApi = jsonDecode(response.);
+      //   setState(() {
+      //     //memasukan data yang di dapat dari internet ke variabel _get
+      //     cekDataJadwal = 'Tidak Ada Jadwal';
+      //   });
+      // }
     } catch (e) {
       //tampilkan error di terminal
       print(e);
@@ -96,90 +115,90 @@ class _HomePageState extends State<HomePage> {
             _buildUserHomeProfile(), //memanggil method _buildUserHomeProfile
             _buildTopBanner(context), //memanggil method _buildTopBanner
             buildHomeListMapel(), //memanggil method _buildHomeListMapel
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20,
-                    ),
-                    child: Text(
-                      "Berita",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    height: 150,
-                    child: ListView.builder(
-                      itemCount: 5,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: ((context, index) {
-                        return Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: 20.0,
-                          ),
-                          decoration: BoxDecoration(
-                              color: R.colors.primary,
-                              image: DecorationImage(
-                                colorFilter: new ColorFilter.mode(
-                                    Colors.black.withOpacity(0.5),
-                                    BlendMode.dstATop),
-                                image: NetworkImage(
-                                    "https://fashionsista.co/wallpaper/wallpaper/20210202/background-keren-biru-muda-preview.jpg"),
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.circular(20)),
-                          height: 147,
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20.0,
-                                vertical: 15,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Berita " + index.toString(),
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Kegiatan Bakti Sosial Pembagian Sembako",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Kampus B STIE & STMIK JAYAKARTA",
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              )),
-                        );
-                      }),
-                    ),
-                  ),
-                  SizedBox(height: 35),
-                ],
-              ),
-            )
+            // Container(
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [
+            //       Padding(
+            //         padding: EdgeInsets.symmetric(
+            //           horizontal: 20,
+            //         ),
+            //         child: Text(
+            //           "Berita",
+            //           style: TextStyle(
+            //             fontWeight: FontWeight.bold,
+            //             fontSize: 16,
+            //           ),
+            //         ),
+            //       ),
+            //       SizedBox(height: 10),
+            //       Container(
+            //         height: 150,
+            //         child: ListView.builder(
+            //           itemCount: 5,
+            //           scrollDirection: Axis.horizontal,
+            //           itemBuilder: ((context, index) {
+            //             return Container(
+            //               margin: EdgeInsets.symmetric(
+            //                 horizontal: 20.0,
+            //               ),
+            //               decoration: BoxDecoration(
+            //                   color: R.colors.primary,
+            //                   image: DecorationImage(
+            //                     colorFilter: new ColorFilter.mode(
+            //                         Colors.black.withOpacity(0.5),
+            //                         BlendMode.dstATop),
+            //                     image: NetworkImage(
+            //                         "https://fashionsista.co/wallpaper/wallpaper/20210202/background-keren-biru-muda-preview.jpg"),
+            //                     fit: BoxFit.cover,
+            //                   ),
+            //                   borderRadius: BorderRadius.circular(20)),
+            //               height: 147,
+            //               width: MediaQuery.of(context).size.width * 0.8,
+            //               child: Container(
+            //                   width: MediaQuery.of(context).size.width * 0.7,
+            //                   padding: const EdgeInsets.symmetric(
+            //                     horizontal: 20.0,
+            //                     vertical: 15,
+            //                   ),
+            //                   child: Column(
+            //                     mainAxisAlignment: MainAxisAlignment.start,
+            //                     crossAxisAlignment: CrossAxisAlignment.start,
+            //                     children: [
+            //                       Text(
+            //                         "Berita " + index.toString(),
+            //                         style: TextStyle(
+            //                           fontSize: 9,
+            //                           color: Colors.white,
+            //                           fontWeight: FontWeight.bold,
+            //                         ),
+            //                       ),
+            //                       Text(
+            //                         "Kegiatan Bakti Sosial Pembagian Sembako",
+            //                         style: TextStyle(
+            //                           fontSize: 18,
+            //                           color: Colors.white,
+            //                           fontWeight: FontWeight.bold,
+            //                         ),
+            //                       ),
+            //                       Text(
+            //                         "Kampus B STIE & STMIK JAYAKARTA",
+            //                         style: TextStyle(
+            //                           fontSize: 9,
+            //                           color: Colors.white,
+            //                           fontWeight: FontWeight.bold,
+            //                         ),
+            //                       ),
+            //                     ],
+            //                   )),
+            //             );
+            //           }),
+            //         ),
+            //       ),
+            //       SizedBox(height: 35),
+            //     ],
+            //   ),
+            // )
           ],
         ),
       ),
@@ -231,17 +250,17 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => JadwalDetailPage(
-                                            dataKeyNim:
-                                                '${parsedJadwalsResponse!.data?[index].nim}',
-                                            dataKeySemester:
-                                                '${parsedJadwalsResponse!.data?[index].semester}',
-                                            dataKeyKodeMatkul:
-                                                '${parsedJadwalsResponse!.data?[index].idJadwalMataKuliah}',
-                                          )));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => JadwalDetailPage(
+                              //               dataKeyNim:
+                              //                   '${parsedJadwalsResponse!.data?[index].nim}',
+                              //               dataKeySemester:
+                              //                   '${parsedJadwalsResponse!.data?[index].semester}',
+                              //               dataKeyKodeMatkul:
+                              //                   '${parsedJadwalsResponse!.data?[index].idJadwalMataKuliah}',
+                              //             )));
                             },
                             child: Container(
                               decoration: BoxDecoration(

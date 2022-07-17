@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_ecampus/constants/api_url.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,8 +31,8 @@ class _DosenDetailPageState extends State<DosenDetailPage> {
 
   Future getDataDosenDetail() async {
     try {
-      final response = await http.get(Uri.parse(
-          "https://ecampus-flutter.000webhostapp.com/dosen/${widget.dataKeyKodeDosen}"));
+      final response = await http
+          .get(Uri.parse(ApiUrl.baseUrl + "/dosen/${widget.dataKeyKodeDosen}"));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {

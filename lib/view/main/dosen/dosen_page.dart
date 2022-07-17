@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_ecampus/constants/api_url.dart';
 import 'package:flutter_ecampus/constants/r.dart';
 import 'package:flutter_ecampus/models/dosens.dart';
 import 'package:flutter_ecampus/view/main/dosen/dosen_detail_page.dart';
@@ -22,8 +23,7 @@ class _DosenPageState extends State<DosenPage> {
 
   Future getDataDosens() async {
     try {
-      final response = await http
-          .get(Uri.parse("https://ecampus-flutter.000webhostapp.com/dosen"));
+      final response = await http.get(Uri.parse(ApiUrl.baseUrl + "/dosen"));
 
       // cek apakah respon berhasil
       if (response.statusCode == 200) {
